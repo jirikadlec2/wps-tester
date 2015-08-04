@@ -2,6 +2,8 @@ from django.shortcuts import render
 from owslib.wps import monitorExecution
 from tethys_gizmos.gizmo_options import TextInput
 from tethys_apps.sdk import list_wps_service_engines
+import requests
+import csv
 
 def home(request):
     """
@@ -15,7 +17,7 @@ def home(request):
         my_url = my_url.replace('&', '~')
 
         wps_outputs = run_wps(str(my_url))
-        context = {'final_output': wps_outputs }
+        context = {'final_url': wps_outputs[0], 'final_data': wps_outputs[1] }
 
     else:
         display_url = "http://hydrodata.info/chmi-h/cuahsi_1_1.asmx/GetValuesObject?location=CHMI-H:140&variable=CHMI-H:TEPLOTA&startDate=2015-06-01&endDate=2015-08-03&authToken="
@@ -35,6 +37,7 @@ def home(request):
 #test the controller approaching the WPS
 def run_wps(timeseries_url):
 
+    #choose the first wps engine
     wps_engines = list_wps_service_engines()
     my_engine = wps_engines[0]
 
@@ -61,5 +64,18 @@ def run_wps(timeseries_url):
 
     output_data = execution.processOutputs
     final_output_url = output_data[0].reference
-    return final_output_url
+    final_data = read_final_data(final_output_url)
+    return [final_output_url, final_data]
+
+
+def read_final_data(url):
+    r = requests.get(url)
+    data = r.text
+    reader = csv.reader(data.splitlines(), delimiter='\t')
+    rows = []
+    for row in reader:
+        rows.append(row)
+
+    return rows
+
 

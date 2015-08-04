@@ -9,10 +9,12 @@
       <input type="submit" name="name-form-submit" class="btn btn-default">
   </form>
 <script>document.getElementById("inputURL").style["width"] = '1200px'</script>
-  
 
-  <p>WPS final output</p>
-  <a href="{{final_output}}">{{final_output}}</a>
+
+  <p>WPS result url</p>
+  <a href="{{final_url}}">{{final_url}}</a>
+  <p>WPS result data</p>
+  <pre>{{final_data}}</pre>
 {% endblock %}
 
 {% block app_actions %}
